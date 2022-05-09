@@ -4,7 +4,7 @@ require_relative 'lib/omniauth/line_login/version'
 
 Gem::Specification.new do |spec|
   spec.name = 'omniauth-line_login'
-  spec.version = Omniauth::LineLogin::VERSION
+  spec.version = OmniAuth::LineLogin::VERSION
   spec.authors = ['takahashim']
   spec.email = ['takahashimm@gmail.com']
 

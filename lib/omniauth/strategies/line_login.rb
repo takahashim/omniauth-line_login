@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-module Omniauth
+module OmniAuth
   module Strategies
     # OmniAuth Strategy for LINE Login
     class LineLogin < OmniAuth::Strategies::OAuth2
       option :name, 'line_login'
-      option :scope, 'profile openid email'
+      option :scope, 'profile openid'
 
       option :client_options, {
         site: 'https://api.line.me',
@@ -13,11 +13,7 @@ module Omniauth
         token_url: '/oauth2/v2.1/token'
       }
 
-      option :authorize_params, {
-        nonce: new_nonce
-      }
-
-      uid { raw_info['userId'] }
+      uid { raw_info['sub'] }
 
       info do
         {
@@ -34,8 +30,11 @@ module Omniauth
 
       private
 
-      def new_nonce
-        session['omniauth.nonce'] = SecureRandom.uuid
+      def authorize_params
+        super.tap do |params|
+          params[:nonce] = SecureRandom.uuid
+          session["omniauth.nonce"] = params[:nonce]
+        end
       end
 
       def callback_url
@@ -51,6 +50,7 @@ module Omniauth
                                                  nonce: session.delete('omniauth.nonce')
                                                }
                                              }).parsed
+        Rails.logger.info("token:#{@id_token_payload.inspect}")
         @id_token_payload
       end
     end
